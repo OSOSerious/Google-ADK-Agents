@@ -1,0 +1,10 @@
+.git
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.venv
+.DS_Store
+.pytest_cache
+.ipynb_checkpoints
+venv/ 
