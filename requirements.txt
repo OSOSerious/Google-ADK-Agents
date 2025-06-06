@@ -1,3 +1,4 @@
 google-adk
 yfinance
-litellm 
+litellm
+web3 
