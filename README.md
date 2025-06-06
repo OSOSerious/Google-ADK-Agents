@@ -14,6 +14,19 @@ Ensure you have Python 3.9+ installed. This project uses `uv` for dependency man
 pip install uv
 ```
 
+### Ollama Setup
+
+This project uses Ollama to run the `llama3.2:latest` model. Please ensure you have Ollama installed and the model pulled:
+
+1.  **Install Ollama:**
+    Follow the instructions on the [Ollama website](https://ollama.com/download) to install Ollama for your operating system.
+
+2.  **Pull the Llama 3.2 model:**
+    Once Ollama is installed, open your terminal and run:
+    ```bash
+    ollama pull llama3.2:latest
+    ```
+
 ### General Steps (All Operating Systems)
 
 1.  **Clone the repository:**
