@@ -95,3 +95,25 @@ Alternatively, you can run the ADK Stock Price Agent using Docker. Ensure you ha
 ## Usage
 
 Once the ADK Web Server is running, you can interact with the agent through the web UI to get stock prices. Provide a ticker symbol when prompted.
+
+## Multi-Chain Crypto Capabilities (EVM & Cosmos)
+
+This project now includes preliminary support for multi-chain crypto interactions through the ADK agent. The `app/agent.py` file has been updated with the following tools:
+
+-   `get_evm_balance(address: str, rpc_url: str)`: Fetches the ETH balance for a given EVM address. By default, it uses a public Ethereum Mainnet Infura RPC URL. **Remember to replace `YOUR_INFURA_PROJECT_ID` with your actual Infura Project ID for full functionality.**
+-   `get_cosmos_balance_placeholder(address: str, chain_id: str, denom: str)`: A placeholder tool for Cosmos chain interactions. This currently returns a mock value. To enable real Cosmos chain queries, you will need to replace the placeholder logic with actual API calls to a Cosmos blockchain's RPC/REST endpoints.
+
+### Required Dependencies for Crypto Tools
+
+For the EVM tool to function correctly, the `web3` Python library is required. This has been added to `requirements.txt`. Ensure you have installed it by running:
+
+```bash
+uv pip install -r requirements.txt
+```
+
+### Interacting with Crypto Tools
+
+When interacting with the agent via the web UI, you can prompt it to use these new tools. For example:
+
+-   To get an ETH balance: "What is the ETH balance of 0x... (EVM address)?"
+-   To get a Cosmos balance (currently placeholder): "What is the ATOM balance of cosmos1... (Cosmos address) on cosmoshub-4?"
