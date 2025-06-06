@@ -1,4 +1,2 @@
 google-adk
-yfinance
-litellm
-web3 
+litellm 
