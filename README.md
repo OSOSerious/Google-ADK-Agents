@@ -92,28 +92,38 @@ Alternatively, you can run the ADK Stock Price Agent using Docker. Ensure you ha
 -   `README.md`: This file.
 -   `main.py`, `pyproject.toml`, `uv.lock`: Other project files.
 
-## Usage
+## Legal Automation Orchestrator
 
-Once the ADK Web Server is running, you can interact with the agent through the web UI to get stock prices. Provide a ticker symbol when prompted.
+This project now features a specialized ADK agent designed to orchestrate legal client onboarding tasks through a private, local agent-to-agent (A2A) system. The `root_agent` acts as an orchestrator, delegating tasks to specialized, hypothetical internal legal sub-agents.
 
-## Multi-Chain Crypto Capabilities (EVM & Cosmos)
+### Core Client Onboarding Services (Simulated Delegation)
 
-This project now includes preliminary support for multi-chain crypto interactions through the ADK agent. The `app/agent.py` file has been updated with the following tools:
+The `app/agent.py` file has been updated to include a generic `call_sub_agent_tool` that simulates interaction with various internal legal sub-agents. These interactions are for **local use only** and do not involve actual external API calls, reinforcing the private AI aspect. The orchestrator can delegate the following tasks:
 
--   `get_evm_balance(address: str, rpc_url: str)`: Fetches the ETH balance for a given EVM address. By default, it uses a public Ethereum Mainnet Infura RPC URL. **Remember to replace `YOUR_INFURA_PROJECT_ID` with your actual Infura Project ID for full functionality.**
--   `get_cosmos_balance_placeholder(address: str, chain_id: str, denom: str)`: A placeholder tool for Cosmos chain interactions. This currently returns a mock value. To enable real Cosmos chain queries, you will need to replace the placeholder logic with actual API calls to a Cosmos blockchain's RPC/REST endpoints.
+1.  **Collect Initial Client Information:**
+    -   **Tool:** `call_sub_agent_tool(agent_name='intake_agent', tool_name='collect_client_info', tool_args={'client_name': '...'})
+    -   **Purpose:** Simulates gathering basic client details like name, contact, and case type.
 
-### Required Dependencies for Crypto Tools
+2.  **Draft Initial Client Agreement:**
+    -   **Tool:** `call_sub_agent_tool(agent_name='document_agent', tool_name='draft_initial_agreement', tool_args={'client_id': '...', 'agreement_type': '...'})
+    -   **Purpose:** Simulates drafting an initial client agreement (e.g., retainer, engagement letter).
 
-For the EVM tool to function correctly, the `web3` Python library is required. This has been added to `requirements.txt`. Ensure you have installed it by running:
+3.  **Perform Conflict of Interest Check:**
+    -   **Tool:** `call_sub_agent_tool(agent_name='conflict_check_agent', tool_name='check_conflicts', tool_args={'client_name': '...'})
+    -   **Purpose:** Simulates checking for conflicts of interest against internal firm records.
 
-```bash
-uv pip install -r requirements.txt
-```
+4.  **Perform Internal KYC/AML Check:**
+    -   **Tool:** `call_sub_agent_tool(agent_name='intake_agent', tool_name='perform_internal_kyc_aml', tool_args={'client_id': '...'})
+    -   **Purpose:** Simulates an internal Know Your Client (KYC) and Anti-Money Laundering (AML) check.
 
-### Interacting with Crypto Tools
+5.  **Setup Client Billing:**
+    -   **Tool:** `call_sub_agent_tool(agent_name='billing_agent', tool_name='setup_client_billing', tool_args={'client_id': '...', 'fee_structure': '...'})
+    -   **Purpose:** Simulates setting up the client's billing account and defining the fee structure.
 
-When interacting with the agent via the web UI, you can prompt it to use these new tools. For example:
+6.  **Create New Case Entry:**
+    -   **Tool:** `call_sub_agent_tool(agent_name='case_agent', tool_name='create_new_case_entry', tool_args={'client_id': '...', 'case_title': '...'})
+    -   **Purpose:** Simulates creating a new case or matter within the firm's internal case management system.
 
--   To get an ETH balance: "What is the ETH balance of 0x... (EVM address)?"
--   To get a Cosmos balance (currently placeholder): "What is the ATOM balance of cosmos1... (Cosmos address) on cosmoshub-4?"
+### Interacting with the Legal Orchestrator Agent
+
+Once the ADK Web Server is running, you can interact with this specialized agent through the web UI. Prompt it to perform client onboarding tasks by specifying the `agent_name`, `tool_name`, and `tool_args` as described above. The agent will respond with simulated results for each delegated task.
