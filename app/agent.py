@@ -1,76 +1,136 @@
 from google.adk.agents import Agent
 from google.adk.models.lite_llm import LiteLlm
-import yfinance as yf
-from web3 import Web3, HTTPProvider
 
-def get_stock_price(ticker: str) -> float:
+# Simulated configuration for other agents in an A2A system
+# In a real system, these would be actual service endpoints or discovery mechanisms.
+SUB_AGENT_SERVICES = {
+    "intake_agent": {"endpoint": "http://localhost:8002/legal_intake_api"},
+    "document_agent": {"endpoint": "http://localhost:8003/legal_docs_api"},
+    "conflict_check_agent": {"endpoint": "http://localhost:8004/legal_conflict_api"},
+    "billing_agent": {"endpoint": "http://localhost:8005/legal_billing_api"},
+    "case_agent": {"endpoint": "http://localhost:8006/legal_case_api"},
+}
+
+def call_sub_agent_tool(agent_name: str, tool_name: str, tool_args: dict) -> dict:
     """
-    Fetch the current price of a stocck price for a given ticker symbol.
+    Delegates a tool call to a hypothetical sub-agent for legal client onboarding.
 
     Args:
-         ticker (str): The stock ticker symbol.
+        agent_name (str): The name of the sub-agent to call (e.g., "intake_agent", "document_agent").
+        tool_name (str): The name of the tool to call on the sub-agent (e.g., "collect_client_info", "draft_initial_agreement").
+        tool_args (dict): A dictionary of arguments for the sub-agent's tool.
 
     Returns:
-        float: The current price of the stock.
+        dict: A dictionary simulating the response from the sub-agent.
     """
-    stock = yf.Ticker(ticker)
-    price = stock.info.get("currentPrice", "Price not available")
-    return {"price": price, "ticker": ticker}
+    if agent_name not in SUB_AGENT_SERVICES:
+        return {"error": f"Sub-agent '{agent_name}' not found in configuration."}
 
-def get_evm_balance(address: str, rpc_url: str = "https://mainnet.infura.io/v3/your-infura-project-id") -> dict:
-    """
-    Fetch the ETH balance of a given EVM address.
+    target_endpoint = SUB_AGENT_SERVICES[agent_name]["endpoint"]
+    print(f"[A2A Orchestrator] Delegating call to {agent_name} ({target_endpoint}) for tool '{tool_name}' with args: {tool_args}")
 
-    Args:
-        address (str): The EVM wallet address.
-        rpc_url (str): The RPC URL of the EVM chain. Defaults to Ethereum Mainnet (Infura).
-                       Replace 'YOUR_INFURA_PROJECT_ID' with your actual Infura Project ID.
-
-    Returns:
-        dict: A dictionary containing the address and its balance in Ether.
-    """
-    try:
-        w3 = Web3(HTTPProvider(rpc_url))
-        if not w3.is_connected():
-            return {"error": f"Could not connect to EVM RPC at {rpc_url}"}
-        
-        checksum_address = w3.to_checksum_address(address)
-        balance_wei = w3.eth.get_balance(checksum_address)
-        balance_eth = w3.from_wei(balance_wei, 'ether')
-        return {"address": address, "balance_eth": float(balance_eth), "rpc_url": rpc_url}
-    except Exception as e:
-        return {"error": f"Failed to get EVM balance for {address}: {str(e)}"}
-
-def get_cosmos_balance_placeholder(address: str, chain_id: str, denom: str) -> dict:
-    """
-    Placeholder tool to demonstrate Cosmos chain interaction.
-    In a real implementation, this would use a Cosmos SDK client or make direct API calls.
-
-    Args:
-        address (str): The Cosmos wallet address.
-        chain_id (str): The ID of the Cosmos chain (e.g., "cosmoshub-4").
-        denom (str): The denomination of the token (e.g., "uatom").
-
-    Returns:
-        dict: A dictionary containing the address, mock balance, chain_id, and denom.
-    """
-    print(f"[Cosmos Tool Placeholder] Attempting to get {denom} balance for {address} on {chain_id}")
-    # In a real scenario, you'd use a Cosmos SDK client or direct API calls here.
-    # Example: response = requests.get(f"https://some-cosmos-api.com/banks/{address}/balances")
-    mock_balance = 123.456 # Replace with actual logic
-    return {"address": address, "balance": mock_balance, "chain_id": chain_id, "denom": denom}
+    # Simulate responses for legal client onboarding tasks
+    if tool_name == "collect_client_info":
+        client_name = tool_args.get("client_name", "Unnamed Client")
+        return {
+            "status": "success",
+            "agent": agent_name,
+            "tool": tool_name,
+            "result": {
+                "client_id": f"LCL-001-{client_name.replace(' ', '-')}",
+                "onboarding_status": "initial_data_collected",
+                "next_step": "Draft initial client agreement and perform conflict check.",
+                "details": f"Initial client information for {client_name} successfully collected. Key questions answered: Name, Contact, Case Type. Next: Document drafting and conflict check.",
+                "source": f"Simulated {agent_name}"
+            }
+        }
+    elif tool_name == "draft_initial_agreement":
+        client_id = tool_args.get("client_id", "N/A")
+        agreement_type = tool_args.get("agreement_type", "client agreement")
+        return {
+            "status": "success",
+            "agent": agent_name,
+            "tool": tool_name,
+            "result": {
+                "document_id": f"DOC-{client_id}-{agreement_type.replace(' ', '-')}",
+                "onboarding_status": "agreement_drafted",
+                "next_step": "Review draft and send to client.",
+                "details": f"Drafted initial {agreement_type} for client {client_id}. Standard clauses included. Requires review by paralegal/attorney.",
+                "source": f"Simulated {agent_name}"
+            }
+        }
+    elif tool_name == "check_conflicts":
+        client_name = tool_args.get("client_name", "Unnamed Client")
+        return {
+            "status": "success",
+            "agent": agent_name,
+            "tool": tool_name,
+            "result": {
+                "conflicts_found": False,
+                "onboarding_status": "conflict_check_complete",
+                "details": f"Conflict check for {client_name} completed against internal records. No direct conflicts found at this stage. Proceed with caution and further due diligence.",
+                "source": f"Simulated {agent_name}"
+            }
+        }
+    elif tool_name == "perform_internal_kyc_aml":
+        client_id = tool_args.get("client_id", "N/A")
+        return {
+            "status": "success",
+            "agent": agent_name,
+            "tool": tool_name,
+            "result": {
+                "kyc_aml_status": "cleared_internal",
+                "details": f"Internal KYC/AML check for client {client_id} completed. No immediate red flags found based on available internal data. Further external checks may be required based on firm policy.",
+                "source": f"Simulated {agent_name}"
+            }
+        }
+    elif tool_name == "setup_client_billing":
+        client_id = tool_args.get("client_id", "N/A")
+        fee_structure = tool_args.get("fee_structure", "hourly")
+        return {
+            "status": "success",
+            "agent": agent_name,
+            "tool": tool_name,
+            "result": {
+                "billing_account_id": f"BILL-{client_id}",
+                "status": "billing_setup_complete",
+                "details": f"Billing account for client {client_id} setup with {fee_structure} fee structure. Ready for time entry and invoicing.",
+                "source": f"Simulated {agent_name}"
+            }
+        }
+    elif tool_name == "create_new_case_entry":
+        client_id = tool_args.get("client_id", "N/A")
+        case_title = tool_args.get("case_title", "New Legal Matter")
+        return {
+            "status": "success",
+            "agent": agent_name,
+            "tool": tool_name,
+            "result": {
+                "case_id": f"CASE-{client_id}-{case_title.replace(' ', '-')}",
+                "status": "case_entry_created",
+                "details": f"New case entry '{case_title}' created for client {client_id} in the internal case management system. Ready for document association and task assignment.",
+                "source": f"Simulated {agent_name}"
+            }
+        }
+    else:
+        return {"status": "error", "message": f"Simulated sub-agent tool '{tool_name}' not recognized for {agent_name}."}
 
 
 base_agent = Agent(
     model=LiteLlm(model="ollama_chat/llama3.2:latest"),
-    tools=[get_stock_price, get_evm_balance, get_cosmos_balance_placeholder], 
+    tools=[call_sub_agent_tool], 
     name='root_agent',
-    description="A helpful agent that gets stock or crypto prices.",
-    instruction="You are a financial assistant. Always use the provided tools to get financial information."
-                "Use get_stock_price for stock ticker symbols, including the ticker symbol in your response."
-                "Use get_evm_balance to fetch ETH balances for EVM addresses, requiring an address and optionally an RPC URL."
-                "Use get_cosmos_balance_placeholder for Cosmos chain balances, requiring an address, chain ID, and denomination."
-                "When responding, include the relevant addresses, ticker symbols, chain IDs, and denominations."
+    description="A specialized legal automation orchestrator agent for client onboarding.",
+    instruction="You are a legal automation orchestrator. Your primary goal is to assist law firms and paralegals with client onboarding by delegating tasks to specialized internal legal agents."
+                "Use call_sub_agent_tool to delegate onboarding tasks. You must specify the 'agent_name', 'tool_name', and 'tool_args' (a dictionary) for the delegation."
+                "Here are the core client onboarding services you can orchestrate:"
+                "1. To **collect initial client information (basic onboarding questions)**, use `agent_name='intake_agent'` and `tool_name='collect_client_info'` with a `'client_name'` in `tool_args`. This simulates gathering name, contact, and case type."
+                "2. To **draft an initial client agreement**, use `agent_name='document_agent'` and `tool_name='draft_initial_agreement'` with `'client_id'` and `'agreement_type'` (e.g., 'retainer', 'engagement letter') in `tool_args`."
+                "3. To **perform a conflict of interest check**, use `agent_name='conflict_check_agent'` and `tool_name='check_conflicts'` with a `'client_name'` in `tool_args`."
+                "4. To **perform an internal KYC/AML check**, use `agent_name='intake_agent'` and `tool_name='perform_internal_kyc_aml'` with a `'client_id'` in `tool_args`."
+                "5. To **set up client billing**, use `agent_name='billing_agent'` (hypothetical, add to SUB_AGENT_SERVICES) and `tool_name='setup_client_billing'` with `'client_id'` and `'fee_structure'` (e.g., 'hourly', 'flat_fee') in `tool_args`."
+                "6. To **create a new case entry**, use `agent_name='case_agent'` (hypothetical, add to SUB_AGENT_SERVICES) and `tool_name='create_new_case_entry'` with `'client_id'` and `'case_title'` in `tool_args`."
+                "When responding, summarize the delegated task and its simulated results, guiding the user on the next steps in the onboarding process."
 )
     
 root_agent = base_agent
