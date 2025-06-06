@@ -62,6 +62,29 @@ adk web --port 8001
 
 Access the web UI at `http://localhost:8001`.
 
+### Docker Setup
+
+Alternatively, you can run the ADK Stock Price Agent using Docker. Ensure you have Docker installed and running on your system.
+
+1.  **Build the Docker Image:**
+
+    Navigate to the root directory of this project (`ADK_AI`) in your terminal and run:
+
+    ```bash
+    docker build -t adk-stock-agent .
+    ```
+
+2.  **Run the Docker Container:**
+
+    ```bash
+    docker run -p 8001:8001 adk-stock-agent
+    ```
+
+    **Important Note on Ollama:**
+    The Docker container runs your ADK agent, but it *does not* run the Ollama server itself. You need to ensure your Ollama server (with the `llama3.2:latest` model) is running and accessible from where your Docker container will be running. If Ollama is running on your host machine, you might need to configure LiteLLM in your agent (e.g., in `app/agent.py` or via an environment variable) to use `http://host.docker.internal:11434` (for Docker Desktop on macOS/Windows) or your host machine's actual IP address instead of `localhost` or `127.0.0.1`.
+
+    Access the web UI at `http://localhost:8001`.
+
 ## Project Structure
 
 -   `app/agent.py`: Contains the ADK agent definition and the `get_stock_price` tool.
