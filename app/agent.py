@@ -17,7 +17,7 @@ def get_stock_price(ticker: str) -> float:
     price = stock.info.get("currentPrice", "Price not available")
     return {"price": price, "ticker": ticker}
 
-def get_evm_balance(address: str, rpc_url: str = "https://mainnet.infura.io/v3/e4de46eb1645489ebbf0486cd6e90d59") -> dict:
+def get_evm_balance(address: str, rpc_url: str = "https://mainnet.infura.io/v3/your-infura-project-id") -> dict:
     """
     Fetch the ETH balance of a given EVM address.
 
