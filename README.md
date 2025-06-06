@@ -32,7 +32,7 @@ This project uses Ollama to run the `llama3.2:latest` model. Please ensure you h
 1.  **Clone the repository:**
 
     ```bash
-    git clone <YOUR_REPOSITORY_URL>
+    git clone <https://github.com/OSOSerious/Google-ADK-Agents.git>
     cd ADK_AI
     ```
 
